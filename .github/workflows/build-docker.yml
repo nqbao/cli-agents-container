@@ -125,7 +125,7 @@ jobs:
               --arg opencode "$(opencode --version 2>&1 | head -1)" \
               --arg copilot "$(copilot --version 2>&1 | head -1)" \
               --arg pi "$(pi --version 2>&1 | head -1)" \
-              --arg sg "$(sg --version 2>&1 | head -1)" \
+              --arg sg "$(ast-grep --version 2>&1 | head -1)" \
               --arg yq "$(yq --version 2>&1 | head -1)" \
               --arg gh "$(gh --version 2>&1 | head -1)" \
               --arg glab "$(glab --version 2>&1 | head -1)" \

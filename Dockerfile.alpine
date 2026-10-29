@@ -188,7 +188,7 @@ USER aiuser
 WORKDIR /user
 
 # Add labels for GitHub Container Registry
-LABEL org.opencontainers.image.source="https://github.com/chmouel/agents-image"
+LABEL org.opencontainers.image.source="https://github.com/nqbao/cli-agents-container"
 LABEL org.opencontainers.image.description="Alpine-based multi-arch image with AI coding assistants (Codex, Claude Code, Gemini CLI, Antigravity CLI, OpenCode, Pi) and other developer tools"
 LABEL org.opencontainers.image.licenses="MIT"
 

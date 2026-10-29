@@ -1,15 +1,25 @@
 # AI Agents Auto-Build Docker Image
 
-Automated daily builds of an Ubuntu-based Docker image with popular AI coding assistants pre-installed.
+Daily-built, multi-arch Docker images with popular AI coding agents and Kubernetes/Tekton debugging tools pre-installed. Available on Ubuntu, Red Hat UBI 9 and Alpine.
 
 ## Included Tools
 
-- **@openai/codex** - OpenAI Codex CLI coding agent
-- **@anthropic-ai/claude-code** - Anthropic Claude Code CLI
-- **@google/gemini-cli** - Google Gemini CLI
-- **Antigravity CLI** (`agy`) - Google's successor to Gemini CLI
-- **opencode** - OpenCode AI assistant
-- **@earendil-works/pi-coding-agent** - Pi coding agent (`pi`)
+**AI coding agents**
+
+| Command | Tool | Installed from |
+|---------|------|----------------|
+| `claude` | [Claude Code](https://github.com/anthropics/claude-code) | Official install script |
+| `codex` | [OpenAI Codex CLI](https://github.com/openai/codex) | npm `@openai/codex` |
+| `agy` | [Antigravity CLI](https://antigravity.google/) (Google's successor to Gemini CLI) | Official install script |
+| `gemini` | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | npm `@google/gemini-cli` |
+| `copilot` | [GitHub Copilot CLI](https://github.com/github/copilot-cli) | npm `@github/copilot` |
+| `opencode` | [OpenCode](https://github.com/anomalyco/opencode) | GitHub release |
+| `pi` | [Pi coding agent](https://github.com/earendil-works/pi) | npm `@earendil-works/pi-coding-agent` |
+| `paco` | [Paco](https://github.com/pipelines-as-code/paco-cli) AI code reviewer | GitHub release |
+
+**Developer and cluster tools:** Node.js 24 (with npm/npx; on Alpine, the version Alpine packages), `git`, `gh`, `glab`, `kubectl`, `stern`, `yq`, `jq`, `ripgrep` (`rg`), `fd`, `ast-grep` (`sg`), `shellcheck`, `make`, `curl`.
+
+All tools track their latest release: every build installs the newest version.
 
 ## Current Versions
 
@@ -36,100 +46,115 @@ Automated daily builds of an Ubuntu-based Docker image with popular AI coding as
 _Last updated: 2026-10-29T08:34:22Z_
 <!-- versions-end -->
 
+Versions are from the Ubuntu image and are updated automatically after each published build.
+
+## Image Variants
+
+| Tag | Base | Package manager | Notes |
+|-----|------|-----------------|-------|
+| `:latest` | Ubuntu (rolling) | `apt-get` | General-purpose default |
+| `:latest-ubi` | [Red Hat UBI 9](https://catalog.redhat.com/software/base-images) | `dnf` | RHEL-compatible, for OpenShift / enterprise environments |
+| `:latest-alpine` | Alpine Linux | `apk` | musl-based; Node.js comes from Alpine packages |
+
+Each build is also tagged with its commit, e.g. `:main-<sha>`, `:main-<sha>-ubi`, `:main-<sha>-alpine`.
+
+All variants are built for:
+
+- `linux/amd64` (x86_64)
+- `linux/arm64` (including Apple Silicon Macs, running natively)
+
 ## Usage
 
-### Pull from GitHub Container Registry
+### Pull
 
 ```bash
-docker pull ghcr.io/chmouel/agents-image:latest
+docker pull ghcr.io/nqbao/agents-image:latest
 ```
 
-### Run the container
+If the pull is denied, the package may be private: log in with `docker login ghcr.io` using a GitHub token with `read:packages`.
+
+### Run
 
 ```bash
-docker run -it ghcr.io/chmouel/agents-image:latest
+# Interactive shell
+docker run -it --rm ghcr.io/nqbao/agents-image:latest
+
+# Run a specific tool
+docker run -it --rm ghcr.io/nqbao/agents-image:latest claude --help
+docker run -it --rm ghcr.io/nqbao/agents-image:latest codex --help
+docker run -it --rm ghcr.io/nqbao/agents-image:latest agy --help
 ```
 
-### Run a specific tool
+### Work on a local project
 
 ```bash
-# Run Codex
-docker run -it ghcr.io/chmouel/agents-image:latest codex --help
-
-# Run Gemini
-docker run -it ghcr.io/chmouel/agents-image:latest gemini --help
-
-# Run Claude
-docker run -it ghcr.io/chmouel/agents-image:latest claude --help
-
-# Run OpenCode
-docker run -it ghcr.io/chmouel/agents-image:latest opencode --help
+docker run -it --rm \
+  -v "$(pwd)":/workspace -w /workspace \
+  ghcr.io/nqbao/agents-image:latest
 ```
+
+The container runs as `aiuser` (UID/GID 1000), so files it creates in the mounted directory are owned by UID 1000 on the host.
+
+### Keep logins and settings between runs
+
+Agent credentials and config live in the home directory, `/user`. Mount a volume there to persist them:
+
+```bash
+docker run -it --rm \
+  -v agents-home:/user \
+  -v "$(pwd)":/workspace -w /workspace \
+  ghcr.io/nqbao/agents-image:latest
+```
+
+Tools themselves are installed under `/usr/local`, so mounting `/user` never hides or replaces them.
 
 ### Install additional npm packages
 
-The image includes Node.js, so you can install additional npm packages globally:
+The pre-installed tools are owned by root, so install extra global packages into your home directory instead (`/user/.local/bin` is already on `PATH`):
 
 ```bash
-docker run -it ghcr.io/chmouel/agents-image:latest bash
-# Inside container:
-npm install -g <package-name>
+npm install -g --prefix ~/.local <package-name>
 ```
 
-## Build Locally
-
-```bash
-docker build -t agents-image .
-```
-
-For multi-architecture builds:
-
-```bash
-docker buildx build --platform linux/amd64,linux/arm64 -t agents-image .
-```
-
-## Automated Builds
-
-This image is automatically built and pushed to GitHub Container Registry:
-
-- **Daily**: Every day at 2 AM UTC
-- **On push**: When changes are pushed to the main branch
-- **On PR**: For testing (not pushed to registry)
-- **Manual**: Via GitHub Actions workflow dispatch
-
-## Architecture Support
-
-- `linux/amd64` (x86_64)
-- `linux/arm64` (ARM 64-bit)
-  - **Compatible with Apple Silicon** (M1, M2, M3, M4 Macs)
-  - Native ARM64 performance (not emulated)
-
-## Image Size Optimization
-
-The Dockerfile uses multi-stage builds to minimize the final image size while keeping essential tools and Node.js runtime for package management.
-
-## Base Image
-
-Built on **Ubuntu 24.04 LTS** for:
-
-- Official multi-architecture support (AMD64 + ARM64)
-- Long-term stability and security updates
-- Reliable Node.js packages via NodeSource
+Or run a package without installing it: `npx <package-name>`.
 
 ## User Configuration
-
-The container runs as a non-root user for better security:
 
 - **Username**: `aiuser`
 - **UID/GID**: 1000:1000
 - **Home directory**: `/user`
+- **Shell**: `/bin/bash`
 
-### Volume Mounting Example
+There is no `sudo`; tools can't self-update inside the container. Pull a newer image instead.
+
+## Build Locally
 
 ```bash
-# Mount your project directory with correct permissions
-docker run -it -v $(pwd):/workspace ghcr.io/chmouel/agents-image:latest
+make ubuntu   # docker build -t agents-image .
+make ubi      # docker build -f Dockerfile.ubi -t agents-image:ubi .
+make alpine   # docker build -f Dockerfile.alpine -t agents-image:alpine .
+make all      # all three
 ```
+
+Multi-architecture builds (requires `docker buildx`):
+
+```bash
+make buildx-all   # or buildx-ubuntu / buildx-ubi / buildx-alpine
+```
+
+## Automated Builds
+
+Builds run in GitHub Actions (`.github/workflows/build-docker.yml`) and push to `ghcr.io/nqbao/agents-image`:
+
+- **Daily** at 02:00 UTC on `main`: builds and publishes all variants, then updates the versions table above.
+- **Manual** via workflow dispatch, using the helper script (requires an authenticated `gh` CLI):
+
+```bash
+./run-and-tail-workflow.sh      # run on the current branch and follow the logs
+./run-and-tail-workflow.sh -n   # build only, don't publish (even on main)
+```
+
+Images are only published from `main`. Runs on other branches just test the build, which is how to check a change before merging. Pull requests and pushes don't trigger builds.
 
 ## License
 
