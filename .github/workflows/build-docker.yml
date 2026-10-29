@@ -3,6 +3,11 @@ name: Build and Push Docker Image
 on:
   # Allow manual trigger
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Push images and update version.json (only applies on the default branch)"
+        type: boolean
+        default: true
 
   # Daily rebuild at 2 AM UTC
   schedule:
@@ -72,8 +77,8 @@ jobs:
           context: .
           file: ${{ matrix.dockerfile }}
           platforms: linux/amd64,linux/arm64
-          # Only publish from the default branch; manual runs on other branches just test the build
-          push: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+          # Only publish from the default branch, unless a manual run unticks "publish"; other branches just test the build
+          push: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && (github.event_name != 'workflow_dispatch' || inputs.publish) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.variant }}
@@ -87,7 +92,7 @@ jobs:
   update-versions:
     runs-on: ubuntu-latest
     needs: build-and-push
-    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && (github.event_name != 'workflow_dispatch' || inputs.publish)
     permissions:
       contents: write
       packages: read

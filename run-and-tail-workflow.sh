@@ -4,10 +4,14 @@ set -eufo pipefail
 
 WORKFLOW_NAME="build-docker.yml"
 args=()
-if [[ ${1:-} == -d ]]; then
-	args=(-f debug_enabled=true)
+while [[ ${1:-} == -* ]]; do
+	case $1 in
+	-d) args+=(-f debug_enabled=true) ;;
+	-n) args+=(-f publish=false) ;; # build only, don't push images or update version.json
+	*) echo "Usage: $0 [-d] [-n]" >&2 && exit 1 ;;
+	esac
 	shift
-fi
+done
 
 # Run on the current branch (images are only published from the default branch)
 REF=$(git branch --show-current)

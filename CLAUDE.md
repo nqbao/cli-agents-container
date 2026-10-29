@@ -53,6 +53,9 @@ Use the helper script (requires `gh` CLI authenticated):
 
 # Trigger with debug mode enabled
 ./run-and-tail-workflow.sh -d
+
+# Build only, without publishing (even on the default branch)
+./run-and-tail-workflow.sh -n
 ```
 
 The script triggers `.github/workflows/build-docker.yml` on the current branch, waits for the run to appear, then watches it with `gh run watch`. On failure it dumps logs automatically. Images are pushed and `version.json` updated only for runs on the default branch; runs on other branches just test the build.
