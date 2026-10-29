@@ -35,6 +35,9 @@ jobs:
           - variant: ubi
             dockerfile: Dockerfile.ubi
             suffix: "-ubi"
+          - variant: alpine
+            dockerfile: Dockerfile.alpine
+            suffix: "-alpine"
 
     permissions:
       contents: read
