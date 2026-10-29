@@ -71,6 +71,8 @@ jobs:
             suffix=${{ matrix.suffix }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
+            # Short variant alias (:ubuntu, :ubi, :alpine); empty suffix overrides the flavor suffix
+            type=raw,value=${{ matrix.variant }},suffix=,enable={{is_default_branch}}
             type=sha,prefix={{branch}}-
             type=ref,event=pr
 

@@ -11,7 +11,7 @@ Automated daily-built Docker images (Ubuntu rolling, UBI 9 and Alpine) with six 
 - `opencode` — installed from GitHub release binary (anomalyco/opencode)
 - `kubectl`, `stern` — Kubernetes CLI tools for cluster debugging
 
-Published to `ghcr.io/nqbao/agents-image` (`:latest` for Ubuntu, `:latest-ubi` for UBI 9, `:latest-alpine` for Alpine) via GitHub Actions.
+Published to `ghcr.io/nqbao/agents-image` (`:latest`/`:ubuntu` for Ubuntu, `:latest-ubi`/`:ubi` for UBI 9, `:latest-alpine`/`:alpine` for Alpine) via GitHub Actions.
 
 ## Architecture
 
