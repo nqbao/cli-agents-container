@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 # Multi-stage Dockerfile for AI Tools on Ubuntu (rolling)
-# Packages: @openai/codex, @anthropic-ai/claude-code, @google/gemini-cli, opencode, @github/copilot
+# Packages: @openai/codex, @anthropic-ai/claude-code, @google/gemini-cli, opencode, @github/copilot, @earendil-works/pi-coding-agent, antigravity-cli
 # Platform: linux/amd64, linux/arm64
 
 FROM ubuntu:rolling AS builder
 
 # Build arguments for multi-platform support
 ARG TARGETARCH
-ARG NODE_MAJOR=20
+ARG NODE_MAJOR=24
 
 # Environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -48,7 +48,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 
 # Install Node.js from official binary (supports both AMD64 and ARM64)
 ARG TARGETARCH
-RUN NODE_VERSION="20.19.1" && \
+RUN NODE_VERSION="24.22.2" && \
     if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; elif [ "$TARGETARCH" = "arm64" ]; then ARCH="arm64"; fi && \
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" | \
     tar -xJ -C /usr/local --strip-components=1 && \
@@ -58,8 +58,8 @@ ARG CACHEBUST
 
 # Install ast-grep (sg) from GitHub releases
 RUN ASG_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x86_64" || echo "aarch64") && \
-    ASG_VERSION=$(curl -fsSL "https://api.github.com/repos/ast-grep/ast-grep/releases/latest" | \
-        jq -r '.tag_name') && \
+    ASG_VERSION=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/ast-grep/ast-grep/releases/latest" | sed 's|.*/||') && \
     echo "Installing ast-grep ${ASG_VERSION}" && \
     curl -fsSL "https://github.com/ast-grep/ast-grep/releases/download/${ASG_VERSION}/app-${ASG_ARCH}-unknown-linux-gnu.zip" \
         -o /tmp/ast-grep.zip && \
@@ -69,8 +69,8 @@ RUN ASG_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x86_64" || echo "aarch64") &
 
 # Install yq from GitHub releases
 RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64") && \
-    YQ_TAG=$(curl -fsSL "https://api.github.com/repos/mikefarah/yq/releases/latest" | \
-        jq -r '.tag_name') && \
+    YQ_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/mikefarah/yq/releases/latest" | sed 's|.*/||') && \
     echo "Installing yq ${YQ_TAG}" && \
     curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_TAG}/yq_linux_${TARGETARCH_VAL}" \
         -o /usr/local/bin/yq && \
@@ -95,8 +95,8 @@ RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64"
 
 # Install stern (multi-pod log tailing) from GitHub releases
 RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64") && \
-    STERN_TAG=$(curl -fsSL "https://api.github.com/repos/stern/stern/releases/latest" | \
-        jq -r '.tag_name') && \
+    STERN_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/stern/stern/releases/latest" | sed 's|.*/||') && \
     STERN_VERSION=${STERN_TAG#v} && \
     echo "Installing stern ${STERN_TAG}" && \
     curl -fsSL "https://github.com/stern/stern/releases/download/${STERN_TAG}/stern_${STERN_VERSION}_linux_${TARGETARCH_VAL}.tar.gz" | \
@@ -107,7 +107,8 @@ RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64"
 RUN npm install -g \
     @openai/codex \
     @google/gemini-cli \
-    @github/copilot && \
+    @github/copilot \
+    @earendil-works/pi-coding-agent && \
     npm cache clean --force
 
 # Install Claude Code via official install script
@@ -115,6 +116,12 @@ RUN curl -fsSL https://claude.ai/install.sh | bash && \
     cp /root/.local/bin/claude /usr/local/bin/claude && \
     chmod +x /usr/local/bin/claude && \
     claude --version
+
+# Install Antigravity CLI (agy, successor to Gemini CLI) via official install script
+RUN curl -fsSL https://antigravity.google/cli/install.sh | bash && \
+    cp /root/.local/bin/agy /usr/local/bin/agy && \
+    chmod +x /usr/local/bin/agy && \
+    agy --version
 
 # Install OpenCode from GitHub releases (platform-specific binary, latest version)
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
@@ -124,8 +131,8 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     else \
         echo "Unsupported architecture: $TARGETARCH" && exit 1; \
     fi && \
-    OPENCODE_TAG=$(curl -fsSL "https://api.github.com/repos/anomalyco/opencode/releases/latest" | \
-        jq -r '.tag_name') && \
+    OPENCODE_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/anomalyco/opencode/releases/latest" | sed 's|.*/||') && \
     echo "Installing opencode ${OPENCODE_TAG}" && \
     curl -fsSL "https://github.com/anomalyco/opencode/releases/download/${OPENCODE_TAG}/opencode-linux-${OPENCODE_ARCH}.tar.gz" | \
     tar -xz -C /usr/local/bin && \
@@ -133,8 +140,8 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 
 # Install paco (Paco AI code reviewer CLI) from GitHub releases
 RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64") && \
-    PACO_TAG=$(curl -fsSL "https://api.github.com/repos/pipelines-as-code/paco-cli/releases/latest" | \
-        jq -r '.tag_name') && \
+    PACO_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/pipelines-as-code/paco-cli/releases/latest" | sed 's|.*/||') && \
     PACO_VERSION=${PACO_TAG#v} && \
     echo "Installing paco ${PACO_TAG}" && \
     curl -fsSL "https://github.com/pipelines-as-code/paco-cli/releases/download/${PACO_TAG}/paco_${PACO_VERSION}_linux_${TARGETARCH_VAL}.tar.gz" | \
@@ -145,9 +152,11 @@ RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64"
 RUN codex --version && \
     claude --version && \
     gemini --version && \
+    agy --version && \
     opencode --version && \
     paco version && \
     copilot --version && \
+    pi --version && \
     sg --version && \
     yq --version && \
     gh --version && \
@@ -164,7 +173,7 @@ RUN codex --version && \
 FROM ubuntu:rolling
 
 # Build arguments
-ARG NODE_MAJOR=20
+ARG NODE_MAJOR=24
 
 # Environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -203,7 +212,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 
 # Install Node.js from official binary (supports both AMD64 and ARM64)
 ARG TARGETARCH
-RUN NODE_VERSION="20.19.1" && \
+RUN NODE_VERSION="24.22.2" && \
     if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; elif [ "$TARGETARCH" = "arm64" ]; then ARCH="arm64"; fi && \
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" | \
     tar -xJ -C /usr/local --strip-components=1
@@ -224,7 +233,7 @@ WORKDIR /user
 
 # Add labels for GitHub Container Registry
 LABEL org.opencontainers.image.source="https://github.com/chmouel/agents-image"
-LABEL org.opencontainers.image.description="Ubuntu-based multi-arch image with AI coding assistants (Codex, Claude Code, Gemini CLI, OpenCode) and other developer tools"
+LABEL org.opencontainers.image.description="Ubuntu-based multi-arch image with AI coding assistants (Codex, Claude Code, Gemini CLI, Antigravity CLI, OpenCode, Pi) and other developer tools"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Default command

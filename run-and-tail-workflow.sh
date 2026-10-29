@@ -4,12 +4,20 @@ set -eufo pipefail
 
 WORKFLOW_NAME="build-docker.yml"
 args=()
-if [[ ${1:-} == -d ]]; then
-	args=(-f debug_enabled=true)
+while [[ ${1:-} == -* ]]; do
+	case $1 in
+	-d) args+=(-f debug_enabled=true) ;;
+	-n) args+=(-f publish=false) ;; # build only, don't push images or update version.json
+	*) echo "Usage: $0 [-d] [-n]" >&2 && exit 1 ;;
+	esac
 	shift
-fi
+done
 
-echo "🏃 Triggering workflow: ${WORKFLOW_NAME}"
+# Run on the current branch (images are only published from the default branch)
+REF=$(git branch --show-current)
+args+=(--ref "${REF}")
+
+echo "🏃 Triggering workflow: ${WORKFLOW_NAME} on ${REF}"
 gh workflow run "${args[@]}" "${WORKFLOW_NAME}"
 
 echo "🔍 Waiting for the new workflow run to appear..."
@@ -22,7 +30,7 @@ MAX_ATTEMPTS=12 # 12 * 5s = 60s timeout
 while [[ -z "${RUN_ID}" ]]; do
 	# Fetch the latest run's ID and URL on separate lines for robust parsing.
 	# We use printf "%.0f" to format the databaseId as a whole number.
-	RUN_DATA=$(gh run list --workflow=.github/workflows/${WORKFLOW_NAME} --limit 2 --json conclusion,databaseId,url --jq '.[] | select(.conclusion == "") | "\(.databaseId)\t\(.url)"')
+	RUN_DATA=$(gh run list --workflow=.github/workflows/${WORKFLOW_NAME} --branch "${REF}" --limit 2 --json conclusion,databaseId,url --jq '.[] | select(.conclusion == "") | "\(.databaseId)\t\(.url)"')
 
 	# If there is multiple take the first one
 	if [[ $(echo "${RUN_DATA}" | wc -l) -gt 1 ]]; then

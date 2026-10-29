@@ -7,14 +7,16 @@ Automated daily builds of an Ubuntu-based Docker image with popular AI coding as
 - **@openai/codex** - OpenAI Codex CLI coding agent
 - **@anthropic-ai/claude-code** - Anthropic Claude Code CLI
 - **@google/gemini-cli** - Google Gemini CLI
+- **Antigravity CLI** (`agy`) - Google's successor to Gemini CLI
 - **opencode** - OpenCode AI assistant
+- **@earendil-works/pi-coding-agent** - Pi coding agent (`pi`)
 
 ## Current Versions
 
 <!-- versions-start -->
 | Tool | Version |
 |------|---------|
-| node | 20.19.1 |
+| node | 24.22.2 |
 | codex | codex-cli 0.165.0 |
 | claude | 2.1.312 (Claude Code) |
 | gemini | 0.66.0 |
