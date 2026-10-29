@@ -55,7 +55,7 @@ Use the helper script (requires `gh` CLI authenticated):
 ./run-and-tail-workflow.sh -d
 ```
 
-The script triggers `.github/workflows/build-docker.yml`, waits for the run to appear, then watches it with `gh run watch`. On failure it dumps logs automatically.
+The script triggers `.github/workflows/build-docker.yml` on the current branch, waits for the run to appear, then watches it with `gh run watch`. On failure it dumps logs automatically. Images are pushed and `version.json` updated only for runs on the default branch; runs on other branches just test the build.
 
 ## Version Pinning
 
