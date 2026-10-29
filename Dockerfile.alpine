@@ -35,7 +35,9 @@ RUN apk add --no-cache \
         github-cli
 
 # Install ast-grep from Alpine repos (upstream only publishes glibc builds)
-RUN apk add --no-cache ast-grep
+# The apk package ships only `ast-grep`; add the `sg` alias the other variants have
+RUN apk add --no-cache ast-grep && \
+    ln -s /usr/bin/ast-grep /usr/local/bin/sg
 
 # Install Node.js from Alpine repos (nodejs.org only publishes glibc builds)
 # Pi requires Node >= 22.19
@@ -135,6 +137,7 @@ RUN codex --version && \
     paco version && \
     copilot --version && \
     pi --version && \
+    ast-grep --version && \
     sg --version && \
     yq --version && \
     gh --version && \
