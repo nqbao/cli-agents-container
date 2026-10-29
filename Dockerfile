@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 # Multi-stage Dockerfile for AI Tools on Ubuntu (rolling)
-# Packages: @openai/codex, @anthropic-ai/claude-code, @google/gemini-cli, opencode, @github/copilot
+# Packages: @openai/codex, @anthropic-ai/claude-code, @google/gemini-cli, opencode, @github/copilot, @earendil-works/pi-coding-agent
 # Platform: linux/amd64, linux/arm64
 
 FROM ubuntu:rolling AS builder
 
 # Build arguments for multi-platform support
 ARG TARGETARCH
-ARG NODE_MAJOR=20
+ARG NODE_MAJOR=24
 
 # Environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -48,7 +48,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 
 # Install Node.js from official binary (supports both AMD64 and ARM64)
 ARG TARGETARCH
-RUN NODE_VERSION="20.19.1" && \
+RUN NODE_VERSION="24.22.2" && \
     if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; elif [ "$TARGETARCH" = "arm64" ]; then ARCH="arm64"; fi && \
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" | \
     tar -xJ -C /usr/local --strip-components=1 && \
@@ -107,7 +107,8 @@ RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64"
 RUN npm install -g \
     @openai/codex \
     @google/gemini-cli \
-    @github/copilot && \
+    @github/copilot \
+    @earendil-works/pi-coding-agent && \
     npm cache clean --force
 
 # Install Claude Code via official install script
@@ -148,6 +149,7 @@ RUN codex --version && \
     opencode --version && \
     paco version && \
     copilot --version && \
+    pi --version && \
     sg --version && \
     yq --version && \
     gh --version && \
@@ -164,7 +166,7 @@ RUN codex --version && \
 FROM ubuntu:rolling
 
 # Build arguments
-ARG NODE_MAJOR=20
+ARG NODE_MAJOR=24
 
 # Environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -203,7 +205,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 
 # Install Node.js from official binary (supports both AMD64 and ARM64)
 ARG TARGETARCH
-RUN NODE_VERSION="20.19.1" && \
+RUN NODE_VERSION="24.22.2" && \
     if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; elif [ "$TARGETARCH" = "arm64" ]; then ARCH="arm64"; fi && \
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" | \
     tar -xJ -C /usr/local --strip-components=1
@@ -224,7 +226,7 @@ WORKDIR /user
 
 # Add labels for GitHub Container Registry
 LABEL org.opencontainers.image.source="https://github.com/chmouel/agents-image"
-LABEL org.opencontainers.image.description="Ubuntu-based multi-arch image with AI coding assistants (Codex, Claude Code, Gemini CLI, OpenCode) and other developer tools"
+LABEL org.opencontainers.image.description="Ubuntu-based multi-arch image with AI coding assistants (Codex, Claude Code, Gemini CLI, OpenCode, Pi) and other developer tools"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Default command

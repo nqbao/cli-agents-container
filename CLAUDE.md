@@ -4,8 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-Automated daily-built Docker images (Ubuntu rolling and UBI 9) with four AI coding assistants and Kubernetes/Tekton debugging tools pre-installed:
-- `@openai/codex` and `@google/gemini-cli` — installed via npm globally
+Automated daily-built Docker images (Ubuntu rolling and UBI 9) with five AI coding assistants and Kubernetes/Tekton debugging tools pre-installed:
+- `@openai/codex`, `@google/gemini-cli`, and `@earendil-works/pi-coding-agent` (`pi`) — installed via npm globally
 - `claude` — installed via official `https://claude.ai/install.sh` script
 - `opencode` — installed from GitHub release binary (anomalyco/opencode)
 - `kubectl`, `stern` — Kubernetes CLI tools for cluster debugging
@@ -19,7 +19,7 @@ Two Dockerfiles share the same multi-stage structure (`builder` + runtime):
 - **`Dockerfile`** (Ubuntu rolling): uses `apt-get` for system packages; ripgrep, fd-find, and shellcheck come from Ubuntu repos
 - **`Dockerfile.ubi`** (UBI 9): uses `dnf` for system packages; ripgrep, fd, and shellcheck are downloaded from GitHub releases since they are not in UBI repos
 
-Both install Node.js 20.19.1 from official binary tarballs to handle `linux/amd64` and `linux/arm64` via `TARGETARCH`. All other tools (ast-grep, yq, glab, kubectl, stern, opencode) are fetched from GitHub/GitLab releases identically in both variants.
+Both install Node.js 24.22.2 from official binary tarballs to handle `linux/amd64` and `linux/arm64` via `TARGETARCH`. All other tools (ast-grep, yq, glab, kubectl, stern, opencode) are fetched from GitHub/GitLab releases identically in both variants.
 
 ## User Configuration
 
@@ -58,7 +58,7 @@ The script triggers `.github/workflows/build-docker.yml`, waits for the run to a
 
 ## Version Pinning
 
-- Node.js version is hardcoded in both `Dockerfile` and `Dockerfile.ubi` (`NODE_VERSION="20.19.1"`) in **both** the builder and runtime stages — update all four locations when bumping.
+- Node.js version is hardcoded in both `Dockerfile` and `Dockerfile.ubi` (`NODE_VERSION="24.22.2"`) in **both** the builder and runtime stages — update all four locations when bumping. Pi requires Node >= 22.19.
 - OpenCode version is resolved dynamically at build time via the GitHub API (`/repos/anomalyco/opencode/releases/latest`) — no version to maintain.
 - All tool installs (npm, claude install.sh, opencode) are cache-busted on every CI run via `ARG CACHEBUST` (set to `github.run_id` in the workflow), while the Node.js download layer remains cached.
 - CI uses a matrix strategy to build both Ubuntu and UBI variants; GHA caches are scoped per variant to avoid conflicts.
