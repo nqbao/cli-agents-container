@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Multi-stage Dockerfile for AI Tools on Ubuntu (rolling)
-# Packages: @openai/codex, @anthropic-ai/claude-code, @google/gemini-cli, opencode, @github/copilot, @earendil-works/pi-coding-agent
+# Packages: @openai/codex, @anthropic-ai/claude-code, @google/gemini-cli, opencode, @github/copilot, @earendil-works/pi-coding-agent, antigravity-cli
 # Platform: linux/amd64, linux/arm64
 
 FROM ubuntu:rolling AS builder
@@ -117,6 +117,12 @@ RUN curl -fsSL https://claude.ai/install.sh | bash && \
     chmod +x /usr/local/bin/claude && \
     claude --version
 
+# Install Antigravity CLI (agy, successor to Gemini CLI) via official install script
+RUN curl -fsSL https://antigravity.google/cli/install.sh | bash && \
+    cp /root/.local/bin/agy /usr/local/bin/agy && \
+    chmod +x /usr/local/bin/agy && \
+    agy --version
+
 # Install OpenCode from GitHub releases (platform-specific binary, latest version)
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
         OPENCODE_ARCH="x64"; \
@@ -146,6 +152,7 @@ RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64"
 RUN codex --version && \
     claude --version && \
     gemini --version && \
+    agy --version && \
     opencode --version && \
     paco version && \
     copilot --version && \
@@ -226,7 +233,7 @@ WORKDIR /user
 
 # Add labels for GitHub Container Registry
 LABEL org.opencontainers.image.source="https://github.com/chmouel/agents-image"
-LABEL org.opencontainers.image.description="Ubuntu-based multi-arch image with AI coding assistants (Codex, Claude Code, Gemini CLI, OpenCode, Pi) and other developer tools"
+LABEL org.opencontainers.image.description="Ubuntu-based multi-arch image with AI coding assistants (Codex, Claude Code, Gemini CLI, Antigravity CLI, OpenCode, Pi) and other developer tools"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Default command

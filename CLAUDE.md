@@ -4,9 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-Automated daily-built Docker images (Ubuntu rolling and UBI 9) with five AI coding assistants and Kubernetes/Tekton debugging tools pre-installed:
+Automated daily-built Docker images (Ubuntu rolling and UBI 9) with six AI coding assistants and Kubernetes/Tekton debugging tools pre-installed:
 - `@openai/codex`, `@google/gemini-cli`, and `@earendil-works/pi-coding-agent` (`pi`) — installed via npm globally
 - `claude` — installed via official `https://claude.ai/install.sh` script
+- `agy` (Antigravity CLI, successor to Gemini CLI) — installed via official `https://antigravity.google/cli/install.sh` script
 - `opencode` — installed from GitHub release binary (anomalyco/opencode)
 - `kubectl`, `stern` — Kubernetes CLI tools for cluster debugging
 
@@ -60,5 +61,5 @@ The script triggers `.github/workflows/build-docker.yml`, waits for the run to a
 
 - Node.js version is hardcoded in both `Dockerfile` and `Dockerfile.ubi` (`NODE_VERSION="24.22.2"`) in **both** the builder and runtime stages — update all four locations when bumping. Pi requires Node >= 22.19.
 - OpenCode version is resolved dynamically at build time via the GitHub API (`/repos/anomalyco/opencode/releases/latest`) — no version to maintain.
-- All tool installs (npm, claude install.sh, opencode) are cache-busted on every CI run via `ARG CACHEBUST` (set to `github.run_id` in the workflow), while the Node.js download layer remains cached.
+- All tool installs (npm, claude and agy install.sh, opencode) are cache-busted on every CI run via `ARG CACHEBUST` (set to `github.run_id` in the workflow), while the Node.js download layer remains cached.
 - CI uses a matrix strategy to build both Ubuntu and UBI variants; GHA caches are scoped per variant to avoid conflicts.
