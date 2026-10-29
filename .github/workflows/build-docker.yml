@@ -4,12 +4,15 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
+  # Build (without pushing) on pull requests to validate changes
+  pull_request:
+
   # Daily rebuild at 2 AM UTC
   schedule:
     - cron: "0 2 * * *"
 
 concurrency:
-  group: build-and-push
+  group: build-and-push-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -21,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - variant: ubuntu
