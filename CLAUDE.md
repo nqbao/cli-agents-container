@@ -60,6 +60,6 @@ The script triggers `.github/workflows/build-docker.yml`, waits for the run to a
 ## Version Pinning
 
 - Node.js version is hardcoded in both `Dockerfile` and `Dockerfile.ubi` (`NODE_VERSION="24.22.2"`) in **both** the builder and runtime stages — update all four locations when bumping. Pi requires Node >= 22.19.
-- OpenCode version is resolved dynamically at build time via the GitHub API (`/repos/anomalyco/opencode/releases/latest`) — no version to maintain.
-- All tool installs (npm, claude and agy install.sh, opencode) are cache-busted on every CI run via `ARG CACHEBUST` (set to `github.run_id` in the workflow), while the Node.js download layer remains cached.
+- GitHub-release tools (OpenCode, ast-grep, yq, stern, paco, and on UBI ripgrep/fd/shellcheck) resolve their latest tag via the `https://github.com/<repo>/releases/latest` redirect rather than the GitHub API, to avoid the unauthenticated API rate limit on CI runners — no versions to maintain.
+- All tool installs (npm, claude and agy install.sh, GitHub release downloads) are cache-busted on every CI run via `ARG CACHEBUST` (set to `github.run_id` in the workflow), while the Node.js download layer remains cached.
 - CI uses a matrix strategy to build both Ubuntu and UBI variants; GHA caches are scoped per variant to avoid conflicts.

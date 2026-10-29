@@ -58,8 +58,8 @@ ARG CACHEBUST
 
 # Install ast-grep (sg) from GitHub releases
 RUN ASG_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x86_64" || echo "aarch64") && \
-    ASG_VERSION=$(curl -fsSL "https://api.github.com/repos/ast-grep/ast-grep/releases/latest" | \
-        jq -r '.tag_name') && \
+    ASG_VERSION=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/ast-grep/ast-grep/releases/latest" | sed 's|.*/||') && \
     echo "Installing ast-grep ${ASG_VERSION}" && \
     curl -fsSL "https://github.com/ast-grep/ast-grep/releases/download/${ASG_VERSION}/app-${ASG_ARCH}-unknown-linux-gnu.zip" \
         -o /tmp/ast-grep.zip && \
@@ -69,8 +69,8 @@ RUN ASG_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x86_64" || echo "aarch64") &
 
 # Install yq from GitHub releases
 RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64") && \
-    YQ_TAG=$(curl -fsSL "https://api.github.com/repos/mikefarah/yq/releases/latest" | \
-        jq -r '.tag_name') && \
+    YQ_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/mikefarah/yq/releases/latest" | sed 's|.*/||') && \
     echo "Installing yq ${YQ_TAG}" && \
     curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_TAG}/yq_linux_${TARGETARCH_VAL}" \
         -o /usr/local/bin/yq && \
@@ -95,8 +95,8 @@ RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64"
 
 # Install stern (multi-pod log tailing) from GitHub releases
 RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64") && \
-    STERN_TAG=$(curl -fsSL "https://api.github.com/repos/stern/stern/releases/latest" | \
-        jq -r '.tag_name') && \
+    STERN_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/stern/stern/releases/latest" | sed 's|.*/||') && \
     STERN_VERSION=${STERN_TAG#v} && \
     echo "Installing stern ${STERN_TAG}" && \
     curl -fsSL "https://github.com/stern/stern/releases/download/${STERN_TAG}/stern_${STERN_VERSION}_linux_${TARGETARCH_VAL}.tar.gz" | \
@@ -131,8 +131,8 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     else \
         echo "Unsupported architecture: $TARGETARCH" && exit 1; \
     fi && \
-    OPENCODE_TAG=$(curl -fsSL "https://api.github.com/repos/anomalyco/opencode/releases/latest" | \
-        jq -r '.tag_name') && \
+    OPENCODE_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/anomalyco/opencode/releases/latest" | sed 's|.*/||') && \
     echo "Installing opencode ${OPENCODE_TAG}" && \
     curl -fsSL "https://github.com/anomalyco/opencode/releases/download/${OPENCODE_TAG}/opencode-linux-${OPENCODE_ARCH}.tar.gz" | \
     tar -xz -C /usr/local/bin && \
@@ -140,8 +140,8 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 
 # Install paco (Paco AI code reviewer CLI) from GitHub releases
 RUN TARGETARCH_VAL=$([ "$TARGETARCH" = "amd64" ] && echo "amd64" || echo "arm64") && \
-    PACO_TAG=$(curl -fsSL "https://api.github.com/repos/pipelines-as-code/paco-cli/releases/latest" | \
-        jq -r '.tag_name') && \
+    PACO_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/pipelines-as-code/paco-cli/releases/latest" | sed 's|.*/||') && \
     PACO_VERSION=${PACO_TAG#v} && \
     echo "Installing paco ${PACO_TAG}" && \
     curl -fsSL "https://github.com/pipelines-as-code/paco-cli/releases/download/${PACO_TAG}/paco_${PACO_VERSION}_linux_${TARGETARCH_VAL}.tar.gz" | \
