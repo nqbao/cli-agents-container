@@ -52,9 +52,9 @@ Versions are from the Ubuntu image and are updated automatically after each publ
 
 | Tag | Base | Package manager | Notes |
 |-----|------|-----------------|-------|
-| `:latest` | Ubuntu (rolling) | `apt-get` | General-purpose default |
-| `:latest-ubi` | [Red Hat UBI 9](https://catalog.redhat.com/software/base-images) | `dnf` | RHEL-compatible, for OpenShift / enterprise environments |
-| `:latest-alpine` | Alpine Linux | `apk` | musl-based; Node.js comes from Alpine packages |
+| `:latest`, `:ubuntu` | Ubuntu (rolling) | `apt-get` | General-purpose default |
+| `:latest-ubi`, `:ubi` | [Red Hat UBI 9](https://catalog.redhat.com/software/base-images) | `dnf` | RHEL-compatible, for OpenShift / enterprise environments |
+| `:latest-alpine`, `:alpine` | Alpine Linux | `apk` | musl-based; Node.js comes from Alpine packages |
 
 Each build is also tagged with its commit, e.g. `:main-<sha>`, `:main-<sha>-ubi`, `:main-<sha>-alpine`.
 
