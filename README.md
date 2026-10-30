@@ -27,8 +27,8 @@ All tools track their latest release: every build installs the newest version.
 | Tool | Version |
 |------|---------|
 | node | 24.22.2 |
-| codex | codex-cli 0.165.0 |
-| claude | 2.1.312 (Claude Code) |
+| codex | codex-cli 0.166.0 |
+| claude | 2.1.314 (Claude Code) |
 | gemini | 0.66.0 |
 | agy | 1.4.10 |
 | opencode | 1.19.5 |
@@ -45,7 +45,7 @@ All tools track their latest release: every build installs the newest version.
 | jq | jq-1.8.2 |
 | shellcheck | 0.11.0 |
 
-_Last updated: 2026-10-29T18:04:12Z_
+_Last updated: 2026-10-30T02:27:14Z_
 <!-- versions-end -->
 
 Versions are from the Ubuntu image and are updated automatically after each published build.
