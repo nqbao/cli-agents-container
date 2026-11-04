@@ -123,7 +123,7 @@ RUN curl -fsSL https://antigravity.google/cli/install.sh | bash && \
     chmod +x /usr/local/bin/agy && \
     agy --version
 
-# Install OpenCode from GitHub releases (platform-specific binary, latest version)
+# Install OpenCode 2.x+ from GitHub releases (platform-specific binary, highest stable tag)
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
         OPENCODE_ARCH="x64"; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
@@ -131,8 +131,10 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     else \
         echo "Unsupported architecture: $TARGETARCH" && exit 1; \
     fi && \
-    OPENCODE_TAG=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
-        "https://github.com/anomalyco/opencode/releases/latest" | sed 's|.*/||') && \
+    OPENCODE_TAG=$(git ls-remote --tags --refs https://github.com/anomalyco/opencode.git \
+        | sed -n 's|.*refs/tags/\(v[0-9]*\.[0-9]*\.[0-9]*\)$|\1|p' \
+        | sort -t. -k1.2,1n -k2,2n -k3,3n | tail -n 1) && \
+    case "$OPENCODE_TAG" in v[2-9].*|v[1-9][0-9]*) ;; *) echo "Unexpected opencode tag: '${OPENCODE_TAG}' (need >= v2)" && exit 1;; esac && \
     echo "Installing opencode ${OPENCODE_TAG}" && \
     curl -fsSL "https://github.com/anomalyco/opencode/releases/download/${OPENCODE_TAG}/opencode-linux-${OPENCODE_ARCH}.tar.gz" | \
     tar -xz -C /usr/local/bin && \

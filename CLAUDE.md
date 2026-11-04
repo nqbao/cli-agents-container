@@ -67,6 +67,7 @@ The script triggers `.github/workflows/build-docker.yml` on the current branch, 
 ## Version Pinning
 
 - Node.js version is hardcoded in both `Dockerfile` and `Dockerfile.ubi` (`NODE_VERSION="24.22.2"`) in **both** the builder and runtime stages — update all four locations when bumping. Alpine uses the `nodejs` apk package instead, and the build fails if it is older than 22.19 (required by Pi).
-- GitHub-release tools (OpenCode, ast-grep, yq, stern, paco, and on UBI ripgrep/fd/shellcheck) resolve their latest tag via the `https://github.com/<repo>/releases/latest` redirect rather than the GitHub API, to avoid the unauthenticated API rate limit on CI runners — no versions to maintain.
+- OpenCode resolves the highest stable `vX.Y.Z` tag via `git ls-remote` (not `releases/latest`, which can point to a 1.x maintenance release) and the build fails if it is below v2.
+- Other GitHub-release tools (ast-grep, yq, stern, paco, and on UBI ripgrep/fd/shellcheck) resolve their latest tag via the `https://github.com/<repo>/releases/latest` redirect rather than the GitHub API, to avoid the unauthenticated API rate limit on CI runners — no versions to maintain.
 - All tool installs (npm, claude and agy install.sh, GitHub release downloads) are cache-busted on every CI run via `ARG CACHEBUST` (set to `github.run_id` in the workflow), while the Node.js download layer remains cached.
 - CI uses a matrix strategy to build the Ubuntu, UBI and Alpine variants; GHA caches are scoped per variant to avoid conflicts.
