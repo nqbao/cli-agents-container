@@ -28,12 +28,12 @@ All tools track their latest release: every build installs the newest version.
 |------|---------|
 | node | 24.22.2 |
 | codex | codex-cli 0.171.0 |
-| claude | 2.1.329 (Claude Code) |
+| claude | 2.1.330 (Claude Code) |
 | gemini | 0.70.0 |
-| agy | 1.5.13 |
+| agy | 1.5.14 |
 | opencode | opencode v2.3.2 |
 | copilot | GitHub Copilot CLI 1.0.114. |
-| pi | 1.5.2 |
+| pi | 1.6.0 |
 | sg | ast-grep 0.51.3 |
 | yq | yq (https://github.com/mikefarah/yq/) version v4.54.3 |
 | gh | gh version 2.105.0 (2026-11-17) |
@@ -45,7 +45,7 @@ All tools track their latest release: every build installs the newest version.
 | jq | jq-1.8.2 |
 | shellcheck | 0.11.0 |
 
-_Last updated: 2026-11-20T02:27:43Z_
+_Last updated: 2026-11-22T02:28:53Z_
 <!-- versions-end -->
 
 Versions are from the Ubuntu image and are updated automatically after each published build.
