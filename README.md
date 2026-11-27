@@ -30,7 +30,7 @@ All tools track their latest release: every build installs the newest version.
 | codex | codex-cli 0.172.0 |
 | claude | 2.1.332 (Claude Code) |
 | gemini | 0.71.1 |
-| agy | 1.5.17 |
+| agy | 1.5.18 |
 | opencode | opencode v2.4.2 |
 | copilot | GitHub Copilot CLI 1.0.116. |
 | pi | 1.6.1 |
@@ -45,7 +45,7 @@ All tools track their latest release: every build installs the newest version.
 | jq | jq-1.8.2 |
 | shellcheck | 0.11.0 |
 
-_Last updated: 2026-11-26T02:28:21Z_
+_Last updated: 2026-11-27T02:52:29Z_
 <!-- versions-end -->
 
 Versions are from the Ubuntu image and are updated automatically after each published build.
