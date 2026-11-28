@@ -32,8 +32,8 @@ All tools track their latest release: every build installs the newest version.
 | gemini | 0.71.1 |
 | agy | 1.5.18 |
 | opencode | opencode v2.4.2 |
-| copilot | GitHub Copilot CLI 1.0.116. |
-| pi | 1.6.1 |
+| copilot | GitHub Copilot CLI 1.0.117. |
+| pi | 1.7.0 |
 | sg | ast-grep 0.51.3 |
 | yq | yq (https://github.com/mikefarah/yq/) version v4.54.3 |
 | gh | gh version 2.105.0 (2026-11-17) |
@@ -45,7 +45,7 @@ All tools track their latest release: every build installs the newest version.
 | jq | jq-1.8.2 |
 | shellcheck | 0.11.0 |
 
-_Last updated: 2026-11-27T02:52:29Z_
+_Last updated: 2026-11-28T02:27:25Z_
 <!-- versions-end -->
 
 Versions are from the Ubuntu image and are updated automatically after each published build.
